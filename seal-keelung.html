@@ -1,0 +1,1035 @@
+<title>海豹漫遊基隆</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* Layout: one narrow column, a night-harbor hero, a tide-line timeline of stops, sheets slide up for detail and collage. Dark-first. */
+:root{
+  color-scheme:dark;
+  --bg:#07131f; --bg-2:#0b1c2c; --surface:#0f2336; --surface-2:#15304a; --line:#1f3d5a;
+  --fg:#e7f0f7; --muted:#8ea8bd; --accent:#ffa865; --accent-ink:#2b1404; --danger:#ff8a8a; --teal:#5fd4c6; --ok:#71e0aa;
+  --seal:#a9bccb; --seal-dark:#7d93a6; --seal-belly:#dce6ed; --seal-ink:#15202b; --blush:#ff9fb2;
+  --paper:#fbf8f1; --paper-ink:#2b2b2b;
+  --sky-1:#050e19; --sky-2:#143250; --moon:#fff1c9; --star-op:1; --hill:#0c2134; --hill-2:#102a42;
+  --sea-1:#1c4b6f; --sea-2:#133b5a; --beam:rgba(255,234,170,.16); --bubble:rgba(150,205,240,.45);
+  --shadow:0 18px 40px -18px rgba(0,0,0,.7);
+  --f-display:"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"Fredoka","Noto Sans TC",system-ui,sans-serif;
+  --r:20px;
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eaf2f8; --bg-2:#dde9f2; --surface:#ffffff; --surface-2:#f1f6fa; --line:#cddcea;
+  --fg:#0d2135; --muted:#52708a; --accent:#e2682a; --accent-ink:#ffffff; --danger:#c9362f; --teal:#11877d; --ok:#1c9a60;
+  --seal:#9fb3c4; --seal-dark:#73899d; --seal-belly:#e4ecf2; --seal-ink:#15202b; --blush:#ff8ea4;
+  --sky-1:#8fcaef; --sky-2:#e6f4fc; --moon:#ffe08a; --star-op:0; --hill:#7eb39f; --hill-2:#5f9a85;
+  --sea-1:#58aedb; --sea-2:#3a8dc0; --beam:rgba(255,255,255,0); --bubble:rgba(255,255,255,.7);
+  --shadow:0 18px 36px -20px rgba(20,60,100,.45);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.65;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+button,input,label{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.25}
+svg{display:block}
+
+/* ambient bubbles */
+.bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bubbles span{position:absolute;bottom:-40px;border-radius:50%;border:1.5px solid var(--bubble);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-115vh) translateX(20px)}}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:44px;height:32px}
+.brand b{font-family:var(--f-display);font-size:18px;display:block;line-height:1.2}
+.brand small{color:var(--muted);font-size:12px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.clock{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);padding:5px 12px;border-radius:999px;font-size:14px;letter-spacing:.04em}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.icon-btn svg{width:18px;height:18px}
+
+/* hero */
+.hero{position:relative;z-index:1}
+.hero-art{position:relative;max-width:900px;margin:0 auto}
+.hero-art svg{width:100%;height:auto;max-height:300px}
+.hero-copy{position:relative;margin-top:-28px;display:grid;gap:14px;padding-block:0 8px}
+.eyebrow{font-family:var(--f-num);font-weight:600;letter-spacing:.14em;font-size:12px;color:var(--teal);margin:0}
+.hero h1{font-size:clamp(30px,8vw,44px)}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lede{color:var(--muted);margin:0;max-width:34em}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px}
+.pill svg{width:40px;height:40px}
+.pill b{font-family:var(--f-num);font-size:16px;font-variant-numeric:tabular-nums}
+.pill small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+button.pill{text-align:left}
+button.pill:hover{border-color:var(--accent)}
+.next-dot{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 20%,transparent)}
+.next-dot i{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:ping 1.8s ease-out infinite}
+
+/* timeline */
+main{position:relative;z-index:1;padding-block:24px 60px}
+.section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 18px}
+.section-title h2{font-size:22px}
+.section-title span{color:var(--muted);font-size:13px}
+.timeline{list-style:none;margin:0;padding:0;position:relative;display:grid;gap:22px}
+.timeline::before{content:"";position:absolute;left:27px;top:10px;bottom:10px;width:2px;background:repeating-linear-gradient(to bottom,var(--line) 0 6px,transparent 6px 12px)}
+.stop{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:start}
+.rail{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px;position:relative;z-index:1}
+.rail .t{font-family:var(--f-num);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;background:var(--bg);padding:0 4px;color:var(--muted)}
+.node{width:16px;height:16px;border-radius:50%;background:var(--bg);border:3px solid var(--line);position:relative}
+.stop[data-status="past"] .node{border-color:var(--muted);background:var(--muted)}
+.stop[data-status="now"] .node,.stop[data-status="next"] .node{border-color:var(--accent);background:var(--accent)}
+.stop[data-status="now"] .node::after,.stop[data-status="next"] .node::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--accent);animation:ping 1.8s ease-out infinite}
+.stop[data-status="now"] .rail .t,.stop[data-status="next"] .rail .t{color:var(--accent)}
+.stop.done .node{border-color:var(--ok);background:var(--ok)}
+@keyframes ping{0%{transform:scale(.7);opacity:1}100%{transform:scale(1.7);opacity:0}}
+
+.card{display:block;width:100%;text-align:left;padding:0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s ease,border-color .25s ease}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.stop[data-status="now"] .card,.stop[data-status="next"] .card{border-color:color-mix(in srgb,var(--accent) 70%,var(--line))}
+.stop[data-status="past"] .card{opacity:.72}
+.stop[data-status="past"] .thumb svg{filter:saturate(.45)}
+.thumb{position:relative;aspect-ratio:16/8;max-width:100%;overflow:hidden;background:var(--surface-2)}
+.thumb>svg{width:100%;height:100%}
+.chip{position:absolute;top:10px;left:10px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(7,19,31,.72);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.chip.now{background:var(--accent);color:var(--accent-ink)}
+.chip.done{background:var(--ok);color:#06231a}
+.mini-pola{position:absolute;right:10px;bottom:-6px;width:74px;padding:5px 5px 14px;background:var(--paper);border-radius:3px;transform:rotate(5deg);box-shadow:0 8px 18px rgba(0,0,0,.4)}
+.mini-pola img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#ddd}
+.card-body{padding:14px 16px 16px;display:grid;gap:6px}
+.meta{display:flex;gap:10px;align-items:center;font-family:var(--f-num);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta .num{font-weight:700;color:var(--teal);letter-spacing:.06em}
+.card h3{font-size:20px}
+.place{display:flex;align-items:center;gap:6px;margin:0;color:var(--muted);font-size:14px}
+.place svg{width:15px;height:15px;flex:none;color:var(--teal)}
+.sum{margin:0;font-size:14px}
+.more{font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:4px}
+
+/* finale */
+.finale{margin-top:36px;position:relative;border-radius:28px;padding:22px 18px 22px;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--line);overflow:hidden;display:grid;gap:12px}
+.finale-head{display:flex;align-items:center;gap:12px}
+.finale-head svg{width:76px;height:56px;flex:none}
+.finale h2{font-size:24px}
+.finale p{margin:0;color:var(--muted)}
+.slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:6px 0}
+.slot{aspect-ratio:3/4;border-radius:6px;border:1.5px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:600;color:var(--muted);background:transparent;padding:0;overflow:hidden}
+.slot.has{border:none;background:var(--paper);padding:3px 3px 10px;transform:rotate(var(--rot));box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.slot.has img{width:100%;height:100%;object-fit:cover;display:block;border-radius:2px;background:#ddd}
+.trip-over{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:var(--ok)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);font-weight:700;text-decoration:none;color:var(--fg);transition:transform .15s ease,background .2s ease}
+.btn:active{transform:scale(.97)}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed}
+.btn.danger{color:var(--danger)}
+.btn.block{width:100%}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.btn-row .btn{flex:1 1 140px}
+
+/* sheets */
+.sheet{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;animation:up .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet-bar{position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.sheet-bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.sheet-bar b{font-family:var(--f-display);font-size:17px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-bar .step{font-family:var(--f-num);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.d-art{max-width:900px;margin:0 auto;aspect-ratio:5/3;max-height:420px;width:100%;overflow:hidden}
+.d-art svg{width:100%;height:100%}
+.d-body{display:grid;gap:22px;padding-block:20px 40px}
+.d-head{display:grid;gap:8px}
+.d-head h1{font-size:clamp(26px,7vw,36px)}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.fact{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:5px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.fact svg{width:14px;height:14px;color:var(--teal)}
+.fact b{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.d-intro{margin:0;font-size:16px;line-height:1.85;max-width:38em}
+.say{display:flex;gap:12px;align-items:center}
+.say svg{width:72px;height:52px;flex:none}
+.say p{margin:0;position:relative;background:var(--surface-2);border:1px solid var(--line);padding:10px 14px;border-radius:16px 16px 16px 4px;font-family:var(--f-display);font-size:16px}
+.sect{display:grid;gap:10px}
+.sect h2{font-size:19px;display:flex;align-items:center;gap:8px}
+.sect h2 svg{width:22px;height:22px;color:var(--accent)}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.list li{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.list li::before{content:"";width:8px;height:8px;margin-top:9px;border-radius:50%;background:var(--teal);flex:none}
+.list.food li::before{background:var(--accent)}
+.list.tips li::before{border-radius:2px;background:var(--muted)}
+.route{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.route li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding-bottom:12px;position:relative}
+.route li::before{content:"";width:12px;height:12px;border-radius:50%;border:3px solid var(--teal);margin:6px 0 0 4px;background:var(--bg);z-index:1}
+.route li:not(:last-child)::after{content:"";position:absolute;left:9px;top:20px;bottom:0;width:2px;background:var(--line)}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pager button{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0}
+.pager button:last-child{text-align:right}
+.pager small{display:block;color:var(--muted);font-size:12px}
+.pager span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+.pager .ghost{visibility:hidden}
+
+/* check-in */
+.checkin{border-radius:24px;padding:18px;background:linear-gradient(170deg,color-mix(in srgb,var(--accent) 14%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));display:grid;gap:14px}
+.checkin h2{font-size:21px}
+.checkin>p{margin:0;color:var(--muted);font-size:14px}
+.drop{display:grid;place-items:center;gap:6px;text-align:center;padding:26px 16px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:18px;cursor:pointer;transition:background .2s}
+.drop:hover,.drop.over{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.drop svg{width:96px;height:72px}
+.drop b{font-size:16px}
+.drop span{color:var(--muted);font-size:13px}
+.drop.busy{pointer-events:none;opacity:.7}
+.pola-wrap{display:grid;place-items:center;padding:10px 0 4px}
+.pola{position:relative;margin:0;width:min(300px,86%);background:var(--paper);padding:12px 12px 44px;border-radius:4px;transform:rotate(-2deg);box-shadow:0 18px 36px rgba(0,0,0,.45)}
+.pola img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#d9d9d9;border-radius:2px}
+.pola figcaption{position:absolute;left:14px;right:14px;bottom:10px;font-family:var(--f-display);color:var(--paper-ink);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pola .broken-msg{display:none}
+.pola.broken img{display:none}
+.pola.broken .broken-msg{display:grid;place-items:center;aspect-ratio:4/5;background:#e8e8e8;color:#555;text-align:center;padding:16px;font-size:14px}
+.stamp{position:absolute;right:-18px;top:-20px;width:92px;height:92px;pointer-events:none}
+.stamp.pop{animation:stamp .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes stamp{from{transform:scale(2.2) rotate(-30deg);opacity:0}to{transform:scale(1) rotate(-12deg);opacity:1}}
+.stamp:not(.pop){transform:rotate(-12deg)}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;color:var(--muted);font-weight:500}
+.field input{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:8px 12px;font-size:16px}
+
+/* collage */
+.c-body{display:grid;gap:16px;padding-block:20px 40px}
+.c-prev{display:grid;place-items:center;min-height:300px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px}
+.c-prev img{width:100%;max-width:420px;aspect-ratio:4/5;border-radius:10px;box-shadow:var(--shadow);display:block}
+.loading{display:grid;justify-items:center;gap:8px;color:var(--muted)}
+.loading svg{width:110px;height:80px}
+.hint{margin:0;color:var(--muted);font-size:13px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;z-index:80;background:var(--fg);color:var(--bg);font-weight:700;padding:10px 18px;border-radius:999px;transition:all .3s ease;max-width:calc(100% - 32px);text-align:center;font-size:14px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* svg animation hooks */
+.wv{animation:wv 8s linear infinite}
+@keyframes wv{to{transform:translateX(-100px)}}
+.bob{animation:bob 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-4px) rotate(2.5deg)}}
+.drift{animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translateX(-24px)}to{transform:translateX(24px)}}
+.tw{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.2}}
+.glow{animation:glow 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes glow{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.15);opacity:.5}}
+.blink{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.swing{animation:swing 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 0}
+@keyframes swing{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.steam{animation:steam 2.6s ease-out infinite;opacity:0}
+@keyframes steam{0%{transform:translateY(0);opacity:0}30%{opacity:.8}100%{transform:translateY(-22px);opacity:0}}
+.run{animation:run 11s linear infinite;animation-delay:-4s}
+@keyframes run{from{transform:translateX(-240px)}to{transform:translateX(420px)}}
+.runback{animation:runback 16s linear infinite;animation-delay:-7s}
+@keyframes runback{from{transform:translateX(200px)}to{transform:translateX(-420px)}}
+.zz{animation:zz 3s ease-out infinite;opacity:0}
+@keyframes zz{0%{transform:translate(0,0);opacity:0}30%{opacity:1}100%{transform:translate(10px,-24px);opacity:0}}
+.beam{animation:beam 5s ease-in-out infinite;transform-box:view-box;transform-origin:62px 92px}
+@keyframes beam{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(22deg)}}
+.gull{animation:gull 12s linear infinite}
+@keyframes gull{from{transform:translateX(-60px)}to{transform:translateX(460px)}}
+.flap{animation:flap .6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes flap{to{transform:scaleY(.4)}}
+.rip{animation:rip 4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 0}
+@keyframes rip{0%,100%{transform:scaleY(1) skewX(0)}50%{transform:scaleY(.95) skewX(2deg)}}
+.sail{animation:sail 30s linear infinite}
+@keyframes sail{from{transform:translateX(-80px)}to{transform:translateX(120px)}}
+.blinkred{animation:tw 1.4s steps(2) infinite}
+.bub{animation:bub 6s ease-in infinite;opacity:0}
+@keyframes bub{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-90px);opacity:0}}
+.foam{animation:tw 2.4s ease-in-out infinite}
+.wave-hand{animation:wavehand 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:80% 10%}
+@keyframes wavehand{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
+
+@media (min-width:760px){
+  .hero-copy{margin-top:-60px}
+  .slots{gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .steam,.zz,.bub{opacity:.6}
+}
+</style>
+
+<div class="bubbles" id="bubbles" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand" id="brand"></div>
+    <div class="top-actions">
+      <span class="clock" id="clock" aria-label="現在時間">--:--</span>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="切換深色或淺色"></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-art" id="heroArt"></div>
+  <div class="wrap hero-copy">
+    <p class="eyebrow">KEELUNG · 6 STOPS · 09:00–20:30</p>
+    <h1>跟著海豹，<br>把<em>基隆</em>走一圈</h1>
+    <p class="lede">從西門出發，看正濱彩色屋、踩和平島礁岩、登基隆塔，最後在廟口吃飽回家。每一站都能上傳打卡照，回程就能下載整天的照片拼貼。</p>
+    <div class="hero-stats" id="heroStats"></div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="section-title"><h2>今日行程</h2><span id="dayLabel"></span></div>
+  <ol class="timeline" id="list"></ol>
+  <section class="finale" id="finale" aria-labelledby="finaleTitle"></section>
+</main>
+
+<div class="sheet" id="detail" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle"></div>
+<div class="sheet" id="collage" hidden role="dialog" aria-modal="true" aria-label="旅程拼貼"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- data ---------- */
+const STOPS = [
+  { id:"step1", start:"09:00", end:"10:10", title:"出發前往基隆", place:"捷運西門站 → 基隆火車站", short:"西門出發", map:"基隆火車站", scene:"train",
+    summary:"板南線轉台鐵區間車，一路往海邊去。",
+    intro:"從捷運西門站搭板南線到台北車站，跟著「台鐵」指標轉乘往基隆的區間車，車程約 45 到 60 分鐘，終點就是基隆。抵達後先把大件行李寄放在車站置物櫃，輕裝出發，再到車站旁的公車站轉乘 101 或 103 號公車前往正濱漁港。",
+    route:["捷運板南線：西門 → 台北車站（約 3 分鐘）","台鐵區間車：台北 → 基隆（約 45–60 分鐘，可刷悠遊卡）","基隆市公車 101 或 103：基隆車站 → 正濱漁港一帶（約 15 分鐘）"],
+    highlights:["一出站就是基隆港，第一眼就能看到港口和船","車站置物櫃可以寄放外套與伴手禮"],
+    tips:["悠遊卡先加值，台鐵和基隆公車都能刷","基隆多雨，摺疊傘帶著比較安心","假日早班車人多，提早幾分鐘到月台"],
+    seal:"海豹先搶個靠窗位置，等海出現。" },
+  { id:"step2", start:"10:40", end:"12:00", title:"台版威尼斯打卡", place:"正濱漁港彩色屋", short:"正濱", map:"正濱漁港彩色屋", scene:"houses",
+    summary:"彩色屋倒映在港灣裡，基隆最經典的畫面。",
+    intro:"正濱漁港沿岸一整排彩色屋，是基隆最有代表性的拍照點。站在漁港對岸看過去，紅、黃、藍、綠的房子倒映在水面上，配上停泊的漁船，難怪被叫做「台版威尼斯」。拍完照可以沿著港邊步道慢慢走，附近的阿根納造船廠遺構也在步行範圍內，斑駁的水泥結構很有電影感。",
+    route:["基隆車站搭公車 101 或 103，在正濱漁港附近下車"],
+    highlights:["從對岸拍彩色屋和倒影，水面平靜時最漂亮","沿港邊步道散步，看漁船進出","步行可到阿根納造船廠遺構"],
+    food:["港邊的咖啡店與冰品小店，適合歇腳"],
+    tips:["無風的晴天倒影最清楚","港邊有些地方沒有欄杆，拍照時注意腳步","週末人潮多，早點到比較好拍"],
+    seal:"這裡的房子比我的魚還要五顏六色。" },
+  { id:"step3", start:"12:30", end:"15:30", title:"無敵海景與奇岩怪石", place:"和平島地質公園", short:"和平島", map:"和平島地質公園", scene:"rocks",
+    summary:"海蝕地形、海水泳池，好天氣能看到基隆嶼。",
+    intro:"和平島在基隆港北邊，靠一座橋和本島相連。島上的地質公園保留了海浪長年雕出來的地形：一塊塊像豆腐的豆腐岩、頭重腳輕的蕈狀岩，還有大片海蝕平台。夏天開放的天然海水泳池就在礁岩旁邊，天氣好時能遠遠看到基隆嶼。中午先在園區內用餐，再慢慢把步道走完。",
+    route:["正濱漁港搭公車 101 往和平島方向，約 10 分鐘"],
+    highlights:["豆腐岩、蕈狀岩等海蝕地形","沿步道走上觀海亭看太平洋","天氣好時遠眺基隆嶼","夏季開放的天然海水泳池"],
+    food:["園區內的景觀餐廳或輕食，邊吃邊看海"],
+    tips:["入園需購票，票價與開放時間以官方公告為準","海邊風大、日照強，帶外套和防曬","礁岩濕滑，穿防滑的鞋","不要越過警戒線，浪大時遠離岩岸"],
+    seal:"這片礁岩是海豹的理想午睡地點。" },
+  { id:"step4", start:"16:00", end:"17:00", title:"登高俯瞰基隆港灣", place:"基隆塔", short:"基隆塔", map:"基隆塔", scene:"tower",
+    summary:"搭電梯上塔頂，整個港灣都在腳下。",
+    intro:"基隆塔是 2023 年啟用的新地標，從義二路搭電梯上到塔頂，再經過空橋接到中正公園。站上觀景平台，基隆港、海洋廣場和進出港的船都在腳下。這個時段接近黃昏，運氣好能看到港邊的燈一盞盞亮起來。看完後步行下山，約 10 分鐘就到廟口夜市。",
+    route:["和平島搭公車回市區，在義二路附近下車步行"],
+    highlights:["塔頂觀景平台俯瞰基隆港","空橋連到中正公園","傍晚的港灣夕色與燈光"],
+    tips:["開放時間與票價以官方公告為準","天候不佳時可能暫停開放","高處風大，帽子和小東西拿好"],
+    seal:"從這麼高看港口，船都變得像玩具一樣。" },
+  { id:"step5", start:"17:30", end:"19:30", title:"廟口夜市美食巡禮", place:"基隆廟口夜市", short:"廟口", map:"基隆廟口夜市", scene:"market",
+    summary:"黃燈籠下吃滷肉飯、肉羹湯和營養三明治。",
+    intro:"廟口夜市以奠濟宮為中心，沿著仁三路與愛四路展開，一排黃色燈籠就是它的招牌畫面。很多攤位都有編號，建議先吃正餐再慢慢掃小吃：仁三路的天一香肉焿順點滷肉飯配肉羹湯，再到天盛舖吃現炸的營養三明治，趁熱吃最好。",
+    route:["從基隆塔步行下山約 10 分鐘"],
+    food:["天一香肉焿順：滷肉飯＋肉羹湯","天盛舖營養三明治（58 號攤位，趁熱吃）","鼎邊趖","泡泡冰當飯後甜點"],
+    highlights:["奠濟宮前的黃燈籠街景","一攤一攤有編號的老攤位"],
+    tips:["不少攤位只收現金","尖峰時段排隊久，可以分頭排","垃圾請帶走或丟在指定地點"],
+    seal:"營養三明治裡有沒有魚？海豹想知道。" },
+  { id:"step6", start:"19:30", end:"20:30", title:"吃飽喝足準備賦歸", place:"基隆火車站 → 台北", short:"回家", map:"基隆火車站", scene:"home",
+    summary:"沿港邊散步回車站，在車上整理今天的照片。",
+    intro:"從廟口夜市沿著港邊步行約 10 分鐘回到基隆火車站，先到置物櫃領回行李，再搭台鐵區間車回台北。車上可以整理今天的打卡照，到站前就能把旅程拼貼做好。",
+    route:["廟口夜市步行約 10 分鐘到基隆車站","台鐵區間車：基隆 → 台北（約 45–60 分鐘）"],
+    highlights:["夜晚的基隆港燈光","回程車上整理今天的照片"],
+    tips:["先查好回程班次","置物櫃記得取件","每站的打卡照上傳完，就能在頁面最下方下載旅程拼貼"],
+    seal:"吃飽了，海豹要在車上睡一下。" }
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mins = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const pad = n => String(n).padStart(2,"0");
+let uidN = 0; const uid = () => "u" + (++uidN);
+
+/* ---------- seal ---------- */
+const SEAL = {
+  tail:"M18 74 C10 66 4 62 0 64 C4 70 6 76 4 84 C10 82 16 80 20 80Z",
+  body:"M14 76 C22 52 58 38 90 40 C116 42 134 58 130 76 C127 90 104 95 72 93 C42 92 16 90 14 76Z",
+  belly:"M46 90 C66 84 100 84 126 80 C120 91 100 95 74 94 C60 93 52 92 46 90Z",
+  flip:"M80 82 C76 92 68 97 58 96 C66 92 70 86 72 80Z",
+  mouth:"M103 57 q4 3.5 8 0",
+  whisk:"M97 55 L84 53M97 58 L85 60M117 55 L130 53M117 58 L129 60"
+};
+function sealInner(opts = {}){
+  const eyes = opts.sleepy
+    ? `<path d="M92 43 q5 4 10 0M112 43 q5 4 10 0" stroke="var(--seal-ink)" stroke-width="2" fill="none" stroke-linecap="round"/>`
+    : `<g class="blink"><circle cx="97" cy="42" r="4.6" fill="var(--seal-ink)"/><circle cx="117" cy="42" r="4.6" fill="var(--seal-ink)"/><circle cx="98.6" cy="40.4" r="1.6" fill="#fff"/><circle cx="118.6" cy="40.4" r="1.6" fill="#fff"/></g>`;
+  const flipper = opts.wave
+    ? `<g class="wave-hand"><path d="M84 62 C80 52 82 42 90 36 C90 46 92 54 92 62Z" fill="var(--seal-dark)"/></g>`
+    : `<path d="${SEAL.flip}" fill="var(--seal-dark)"/>`;
+  return `<path d="${SEAL.tail}" fill="var(--seal-dark)"/>
+    <path d="${SEAL.body}" fill="var(--seal)"/>
+    <path d="${SEAL.belly}" fill="var(--seal-belly)" opacity=".85"/>
+    <circle cx="50" cy="60" r="3" fill="var(--seal-dark)" opacity=".45"/><circle cx="62" cy="53" r="2.2" fill="var(--seal-dark)" opacity=".45"/><circle cx="40" cy="68" r="2.4" fill="var(--seal-dark)" opacity=".45"/>
+    <circle cx="106" cy="46" r="27" fill="var(--seal)"/>
+    ${flipper}
+    ${eyes}
+    <ellipse cx="107" cy="55" rx="10" ry="7" fill="var(--seal-belly)"/>
+    <ellipse cx="107" cy="51.5" rx="3.6" ry="2.6" fill="var(--seal-ink)"/>
+    <path d="${SEAL.mouth}" stroke="var(--seal-ink)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <circle cx="90" cy="53" r="4" fill="var(--blush)" opacity=".55"/><circle cx="124" cy="53" r="4" fill="var(--blush)" opacity=".55"/>
+    <path d="${SEAL.whisk}" stroke="var(--seal-ink)" stroke-width=".9" opacity=".5" stroke-linecap="round"/>`;
+}
+const sealSVG = (opts = {}) => `<svg viewBox="-2 16 140 84" aria-hidden="true"><g class="${opts.bob ? "bob" : ""}">${sealInner(opts)}</g></svg>`;
+const sealAt = (x, y, s, opts = {}) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="${opts.bob ? "bob" : ""}">${sealInner(opts)}</g></g>`;
+
+/* ---------- scene parts ---------- */
+const grad = (id, stops) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">${stops.map((c,i)=>`<stop offset="${i/(stops.length-1)}" stop-color="${c}"/>`).join("")}</linearGradient>`;
+function wave(y, amp, fill, dur = 8, op = 1){
+  let d = `M0 ${y}`; for (let x = 0; x < 800; x += 100) d += ` q25 ${-amp} 50 0 t50 0`;
+  return `<path class="wv" style="animation-duration:${dur}s" d="${d} V260 H0Z" fill="${fill}" opacity="${op}"/>`;
+}
+const stars = (n, h, seed = 1) => { let s = seed, out = ""; const r = () => (s = (s*9301+49297)%233280)/233280;
+  for (let i=0;i<n;i++) out += `<circle class="tw" style="animation-delay:${(r()*3).toFixed(2)}s" cx="${(r()*400).toFixed(1)}" cy="${(r()*h).toFixed(1)}" r="${(r()*1.2+.4).toFixed(2)}" fill="#fff"/>`;
+  return out; };
+const cloud = (x,y,s,fill="#fff",op=.9) => `<g transform="translate(${x} ${y}) scale(${s})" fill="${fill}" opacity="${op}"><ellipse cx="0" cy="0" rx="30" ry="9"/><ellipse cx="14" cy="-7" rx="16" ry="10"/><ellipse cx="-10" cy="-4" rx="12" ry="7"/></g>`;
+const boat = (x,y,c,delay=0) => `<g transform="translate(${x} ${y})"><g class="bob" style="animation-delay:${delay}s"><path d="M0 0 h50 l-9 13 h-32Z" fill="${c}"/><rect x="12" y="-12" width="19" height="12" fill="#f3f3f3"/><rect x="16" y="-9" width="5" height="5" fill="#7cc5ef"/><rect x="24" y="-9" width="5" height="5" fill="#7cc5ef"/><path d="M36 -1 v-22" stroke="#555" stroke-width="1.5"/><path d="M36 -23 l11 6 h-11Z" fill="#ff5a5a"/></g></g>`;
+const svgWrap = (inner, vb = "0 0 400 240", label = "") => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}">${inner}</svg>`;
+
+const SCENES = {
+  train(u){
+    let win = ""; for (let i=0;i<5;i++) win += `<rect x="${12+i*36}" y="133" width="26" height="14" rx="3" fill="#d6ecff"/>`;
+    return `<defs>${grad(u+"sk",["#8cc6ee","#cfe8f7","#ffe3c6"])}${grad(u+"se",["#3f9bd0","#1d5e8e"])}</defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>
+    <circle class="glow" cx="322" cy="58" r="34" fill="#fff6d5" opacity=".5"/><circle cx="322" cy="58" r="20" fill="#fff1b8"/>
+    <g class="drift">${cloud(80,48,1.1)}${cloud(220,72,.8)}${cloud(370,36,.7)}</g>
+    <path d="M0 140 C60 108 120 126 170 114 C230 100 300 132 400 108 V180 H0Z" fill="#79b394"/>
+    <path d="M0 158 C70 136 150 152 220 140 C290 130 340 150 400 140 V180 H0Z" fill="#4f8f70"/>
+    <rect y="176" width="400" height="64" fill="url(#${u}se)"/>
+    ${wave(184,3,"#62b4df",7,.7)}${wave(204,4,"#2f7fb3",10,.85)}
+    <rect y="166" width="400" height="5" fill="#5a4a42"/>
+    <g class="run">
+      <rect x="0" y="126" width="190" height="38" rx="12" fill="#2f6fb3"/>
+      <path d="M186 126 h16 q20 0 24 20 v18 h-40Z" fill="#285f9b"/>
+      <rect x="0" y="152" width="226" height="5" fill="#ffcf5a"/>${win}
+      <path d="M196 132 h7 q12 0 16 13 h-23Z" fill="#d6ecff"/>
+      <circle cx="97" cy="142" r="6.5" fill="var(--seal)"/><circle cx="94.6" cy="140.6" r="1.2" fill="#15202b"/><circle cx="99.4" cy="140.6" r="1.2" fill="#15202b"/><ellipse cx="97" cy="143.8" rx="1.5" ry="1" fill="#15202b"/>
+      <g fill="#2a2f36"><circle cx="30" cy="166" r="5"/><circle cx="62" cy="166" r="5"/><circle cx="140" cy="166" r="5"/><circle cx="172" cy="166" r="5"/><circle cx="208" cy="166" r="5"/></g>
+    </g>`;
+  },
+  houses(u){
+    const H = [[62,"#f26b5b"],[54,"#ffc94d"],[70,"#5bb8e8"],[58,"#8fd16a"],[66,"#f59ac0"],[50,"#7d8cf0"],[72,"#ffa24d"],[60,"#4fd1b5"]];
+    const row = H.map(([h,c],i) => { const x = 6+i*49, y = 140-h; let w = "";
+      for (let r=0; r<Math.floor((h-14)/20); r++) w += `<rect x="${x+9}" y="${y+12+r*20}" width="9" height="10" fill="#fff8e6"/><rect x="${x+28}" y="${y+12+r*20}" width="9" height="10" fill="#fff8e6"/>`;
+      return `<rect x="${x}" y="${y}" width="46" height="${h}" fill="${c}"/><rect x="${x-2}" y="${y-6}" width="50" height="7" fill="${c}"/><rect x="${x-2}" y="${y-6}" width="50" height="7" fill="#000" opacity=".18"/>${w}`; }).join("");
+    return `<defs>${grad(u+"sk",["#86c9f0","#e3f4ff"])}${grad(u+"se",["#2f86b8","#12507a"])}<clipPath id="${u}cl"><rect y="142" width="400" height="100"/></clipPath></defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>
+    <g class="drift">${cloud(70,30,1)}${cloud(300,44,.9)}</g>
+    <path d="M0 92 C60 70 120 84 180 74 C250 62 320 86 400 70 V140 H0Z" fill="#79ad97"/>
+    ${row}
+    <rect y="138" width="400" height="5" fill="#5b4a3e"/>
+    <rect y="142" width="400" height="100" fill="url(#${u}se)"/>
+    <g clip-path="url(#${u}cl)"><g class="rip"><g transform="translate(0 286) scale(1 -1)" opacity=".38">${row}</g></g></g>
+    <g class="drift" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".45"><path d="M30 170 h40M150 186 h60M280 168 h36M90 210 h50M250 220 h70"/></g>
+    ${boat(60,182,"#e94f4f",0)}${boat(250,196,"#2f6fb3",1.2)}
+    ${wave(226,3,"#0f4a72",9,.9)}`;
+  },
+  rocks(u){
+    let tofu = ""; for (let x=240;x<400;x+=22) tofu += `<path d="M${x} 196 L${x-8} 240"/>`; tofu += `<path d="M228 212 H400M222 226 H400"/>`;
+    return `<defs>${grad(u+"sk",["#6fc0ee","#d6f0ff"])}${grad(u+"se",["#27a1c8","#0d6690"])}</defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>
+    <circle class="glow" cx="70" cy="44" r="30" fill="#fff8d6" opacity=".55"/><circle cx="70" cy="44" r="17" fill="#fff4bf"/>
+    <g class="gull"><g transform="translate(0 60)"><path class="flap" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="#33414d" stroke-width="2" fill="none"/></g><g transform="translate(-30 78) scale(.7)"><path class="flap" style="animation-delay:.2s" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="#33414d" stroke-width="2" fill="none"/></g></g>
+    <rect y="120" width="400" height="120" fill="url(#${u}se)"/>
+    <path d="M272 122 C286 102 300 94 314 104 C322 110 330 117 342 122Z" fill="#5f87a0"/>
+    ${wave(128,2,"#5bc0e0",9,.6)}${wave(150,3,"#1f8ab5",11,.7)}
+    <path d="M0 240 V168 C18 150 50 146 70 158 C90 148 112 164 120 184 C134 190 142 214 152 240Z" fill="#9c7a58"/>
+    <path d="M0 240 V196 C30 186 70 190 100 204 C120 214 130 226 136 240Z" fill="#7e5f43"/>
+    <g transform="translate(176 0)"><rect x="10" y="176" width="12" height="40" rx="5" fill="#8a6a4b"/><ellipse cx="16" cy="172" rx="26" ry="14" fill="#a8835e"/><ellipse cx="16" cy="168" rx="22" ry="8" fill="#b9946c"/></g>
+    <path d="M222 240 L238 198 C262 188 330 186 362 194 L400 198 V240Z" fill="#b38d65"/>
+    <g stroke="#7d5c3e" stroke-width="1.5" opacity=".55">${tofu}</g>
+    <g class="foam" fill="#fff"><ellipse cx="160" cy="226" rx="22" ry="4"/><ellipse cx="214" cy="220" rx="14" ry="3"/><ellipse cx="128" cy="200" rx="10" ry="3"/></g>
+    ${sealAt(18,112,.55,{bob:true})}`;
+  },
+  tower(u){
+    let city = "", lit = ""; const B = [[0,26,40],[42,36,30],[74,22,46],[226,30,38],[262,40,28],[300,24,44],[330,34,34],[370,30,40]];
+    B.forEach(([x,w,h],i) => { city += `<rect x="${x}" y="${206-h}" width="${w}" height="${h}" fill="#2a2650"/>`;
+      for (let k=0;k<3;k++) lit += `<rect class="tw" style="animation-delay:${((i*3+k)%7)*.4}s" x="${x+4+k*8}" y="${206-h+8+(k%2)*10}" width="4" height="5" fill="#ffd77a"/>`; });
+    let lattice = ""; for (let y=70;y<196;y+=14) lattice += `<path d="M168 ${y} L184 ${y+14}M184 ${y} L168 ${y+14}"/>`;
+    return `<defs>${grad(u+"sk",["#4f4c9c","#e9837a","#ffd28a"])}${grad(u+"se",["#40508a","#232c5a"])}</defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>
+    <g class="drift">${cloud(90,40,1,"#ffc2b6",.8)}${cloud(320,30,.8,"#ffd1c4",.7)}</g>
+    <circle class="glow" cx="300" cy="150" r="40" fill="#ffe6a6" opacity=".45"/><circle cx="300" cy="150" r="26" fill="#ffe9ac"/>
+    <path d="M0 160 C50 132 110 142 160 136 C220 128 280 150 330 140 C360 134 380 140 400 136 V210 H0Z" fill="#5a4a85"/>
+    <path d="M0 240 V112 C30 102 80 106 122 122 L132 240Z" fill="#3a3362"/>
+    <rect x="168" y="62" width="16" height="148" fill="#e8edf5"/>
+    <g stroke="#9aa6c4" stroke-width="1">${lattice}</g>
+    <rect x="148" y="50" width="56" height="16" rx="4" fill="#f4f6fb"/><rect x="152" y="54" width="48" height="6" fill="#8fc6ee"/>
+    <path d="M150 60 L116 112" stroke="#e8edf5" stroke-width="5"/>
+    <circle class="blinkred" cx="176" cy="44" r="3" fill="#ff4d4d"/><path d="M176 50 V46" stroke="#e8edf5" stroke-width="2"/>
+    ${city}${lit}
+    <rect y="206" width="400" height="34" fill="url(#${u}se)"/>
+    <g stroke="#ffd98a" stroke-width="2" opacity=".6" class="drift"><path d="M286 214 h28M292 222 h16M296 230 h10"/></g>
+    <g class="sail"><g transform="translate(200 196)"><path d="M0 10 h70 l-8 10 h-56Z" fill="#f5f7fb"/><rect x="10" y="2" width="44" height="8" fill="#f5f7fb"/><rect x="14" y="4" width="36" height="3" fill="#6f87b8"/><rect x="40" y="-6" width="6" height="8" fill="#e85d5d"/></g></g>
+    ${wave(228,2,"#1d2550",10,.8)}`;
+  },
+  market(u){
+    let lan = ""; [40,95,150,205,260,315,365].forEach((x,i) => { const y = 62 + Math.sin(i/6*Math.PI)*18;
+      lan += `<g transform="translate(${x} ${y})"><g class="swing" style="animation-delay:${i*.3}s"><path d="M0 0 v6" stroke="#ffcf5a" stroke-width="1.5"/><circle cx="0" cy="20" r="20" fill="#ffd25a" opacity=".22"/><ellipse cx="0" cy="20" rx="10" ry="13" fill="#ffc83d"/><rect x="-6" y="5" width="12" height="3" rx="1" fill="#c6461f"/><rect x="-6" y="32" width="12" height="3" rx="1" fill="#c6461f"/><path d="M-4 12 v16M0 9 v22M4 12 v16" stroke="#e8a21d" stroke-width="1"/></g></g>`; });
+    const stall = (x,label) => { let st = ""; for (let i=0;i<6;i++) st += `<rect x="${x+i*18}" y="150" width="18" height="16" fill="${i%2?"#fff3d6":"#e94b3c"}"/>`;
+      return `${st}<path d="M${x} 166 ${Array.from({length:6},(_,i)=>`q9 8 18 0`).join(" ")}" fill="#e94b3c"/>
+        <rect x="${x+6}" y="128" width="96" height="20" rx="4" fill="#ffe7a3"/><text x="${x+54}" y="142.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7a2a12" font-family="Noto Sans TC, sans-serif">${label}</text>
+        <rect x="${x}" y="186" width="108" height="54" fill="#5a2e2e"/><rect x="${x}" y="182" width="108" height="6" fill="#7b3e3a"/>`; };
+    return `<defs>${grad(u+"sk",["#140f30","#3b1f4f","#5a2a4a"])}</defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>${stars(26,90,7)}
+    <path d="M40 124 Q120 92 200 98 Q280 92 360 124 L340 124 Q280 110 200 112 Q120 110 60 124Z" fill="#1d1226"/>
+    <rect x="70" y="122" width="260" height="60" fill="#22152b"/>
+    <path d="M196 98 l4 -10 l4 10Z" fill="#1d1226"/>
+    <path d="M0 58 Q200 98 400 58" stroke="#3b2a3e" stroke-width="1.5" fill="none"/>${lan}
+    ${stall(14,"營養三明治")}${stall(146,"鼎邊趖")}${stall(278,"泡泡冰")}
+    <g transform="translate(200 184)"><path d="M-14 0 h28 q-2 12 -14 12 q-12 0 -14 -12Z" fill="#f5f0e6"/>
+      <path class="steam" d="M-6 -2 q-4 -6 0 -12 q4 -6 0 -12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path class="steam" style="animation-delay:.9s" d="M2 -2 q-4 -6 0 -12 q4 -6 0 -12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path class="steam" style="animation-delay:1.7s" d="M9 -2 q-4 -6 0 -12 q4 -6 0 -12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+    ${sealAt(300,150,.42,{bob:true,wave:true})}
+    <rect y="232" width="400" height="8" fill="#140c22"/>`;
+  },
+  home(u){
+    let win = ""; for (let i=0;i<5;i++) win += `<rect x="${12+i*36}" y="133" width="26" height="14" rx="3" fill="#ffe08a"/>`;
+    let lights = ""; for (let x=10;x<400;x+=26) lights += `<circle class="tw" style="animation-delay:${(x%7)*.3}s" cx="${x}" cy="176" r="2" fill="#ffd27a"/><rect x="${x-1}" y="184" width="2" height="${10+(x%3)*6}" fill="#ffd27a" opacity=".35"/>`;
+    return `<defs>${grad(u+"sk",["#0a1530","#1c2e5a"])}</defs>
+    <rect width="400" height="240" fill="url(#${u}sk)"/>${stars(40,120,3)}
+    <circle class="glow" cx="320" cy="48" r="30" fill="#fff4cc" opacity=".25"/><circle cx="320" cy="48" r="17" fill="#fff4cc"/><circle cx="328" cy="42" r="15" fill="#132350"/>
+    <path d="M0 150 C70 122 150 140 220 128 C290 116 340 140 400 126 V180 H0Z" fill="#132447"/>
+    <rect y="178" width="400" height="62" fill="#0d1c3a"/>${lights}
+    ${wave(214,3,"#0a1730",10,.9)}
+    <rect y="166" width="400" height="5" fill="#2a2c3e"/>
+    <g class="runback">
+      <rect x="0" y="126" width="190" height="38" rx="12" fill="#3a4a7a"/>
+      <path d="M0 126 h-4 q-20 0 -24 20 v18 h28Z" fill="#33426e"/>
+      <rect x="-28" y="152" width="218" height="5" fill="#ffcf5a"/>${win}
+      <circle cx="97" cy="142" r="6.5" fill="var(--seal)"/><path d="M93.5 141 q1.2 1.2 2.4 0M98.6 141 q1.2 1.2 2.4 0" stroke="#15202b" stroke-width="1" fill="none"/><ellipse cx="97" cy="144" rx="1.5" ry="1" fill="#15202b"/>
+      <text class="zz" x="104" y="128" font-size="10" font-weight="700" fill="#cfe2ff" font-family="Fredoka, sans-serif">z</text>
+      <text class="zz" style="animation-delay:1.2s" x="108" y="124" font-size="8" font-weight="700" fill="#cfe2ff" font-family="Fredoka, sans-serif">z</text>
+      <g fill="#1b1d26"><circle cx="20" cy="166" r="5"/><circle cx="52" cy="166" r="5"/><circle cx="140" cy="166" r="5"/><circle cx="172" cy="166" r="5"/></g>
+    </g>`;
+  }
+};
+const scene = (stop) => svgWrap(SCENES[stop.scene](uid()), "0 0 400 240", stop.place + " 插圖");
+
+function heroSVG(){
+  const u = uid();
+  let bubbles = ""; [[250,198,4,0],[262,206,2.6,1.5],[120,210,3,3],[330,214,3.4,2.2]].forEach(([x,y,r,d]) =>
+    bubbles += `<circle class="bub" style="animation-delay:${d}s" cx="${x}" cy="${y}" r="${r}" fill="none" stroke="var(--bubble)" stroke-width="1.2"/>`);
+  return `<svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax slice" role="img" aria-label="海豹坐在港口浮標上，背景是燈塔與夜空">
+    <defs><linearGradient id="${u}sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky-1)"/><stop offset="1" style="stop-color:var(--sky-2)"/></linearGradient></defs>
+    <rect width="400" height="230" fill="url(#${u}sk)"/>
+    <g style="opacity:var(--star-op)">${stars(36,120,11)}</g>
+    <circle class="glow" cx="322" cy="52" r="34" style="fill:var(--moon)" opacity=".22"/><circle cx="322" cy="52" r="18" style="fill:var(--moon)"/>
+    <path d="M0 138 C40 112 90 118 130 126 C170 108 220 104 260 120 C300 110 350 116 400 108 V170 H0Z" style="fill:var(--hill-2)"/>
+    <path d="M150 140 v-26 h4 v26M150 114 h26 v3 h-26M200 140 v-20 h3 v20M200 120 h20 v3 h-20" style="stroke:var(--hill)" stroke-width="2.5" fill="none"/>
+    <path d="M0 150 C40 134 90 138 140 146 C200 138 260 140 400 136 V180 H0Z" style="fill:var(--hill)"/>
+    <g class="beam"><path d="M62 92 L-60 70 L-60 116Z" style="fill:var(--beam)"/></g>
+    <path d="M30 156 C40 140 80 138 92 156Z" style="fill:var(--hill)"/>
+    <path d="M54 142 L57 98 H67 L70 142Z" fill="#f2f2ee"/><path d="M55.6 128 H68.4 L68 120 H56Z M56.4 112 H67.6 L67.2 104 H56.8Z" fill="#e2524a"/>
+    <rect x="53" y="86" width="18" height="12" rx="3" fill="#333a45"/><rect x="56" y="89" width="12" height="7" fill="#ffe7a0"/><path d="M52 86 L62 78 L72 86Z" fill="#e2524a"/>
+    ${wave(160,4,"var(--sea-1)",9,1)}
+    ${wave(176,5,"var(--sea-2)",12,1)}
+    <g transform="translate(206 112)"><g class="bob">
+      <path d="M8 66 h56 l-6 22 h-44Z" fill="#e8513f"/><rect x="8" y="72" width="56" height="6" fill="#fff"/><rect x="30" y="56" width="12" height="12" fill="#e8513f"/>
+      <g transform="translate(-6 -8) scale(.62)">${sealInner({wave:true})}</g>
+    </g></g>
+    ${bubbles}
+    ${wave(196,5,"var(--bg)",10,1)}
+  </svg>`;
+}
+
+const ICON = {
+  pin:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+  nav:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg>`,
+  back:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>`,
+  star:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>`,
+  bowl:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h18a9 9 0 0 1-18 0zM8 8c0-1.5 1-2 1-3.5M12 8c0-1.5 1-2 1-3.5M16 8c0-1.5 1-2 1-3.5"/></svg>`,
+  info:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>`,
+  route:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/></svg>`,
+  cam:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>`,
+  dl:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,
+  moon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>`,
+  sun:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+  share:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg>`
+};
+
+function stampSVG(){
+  const u = uid();
+  return `<svg class="stamp pop" viewBox="0 0 100 100" aria-hidden="true">
+    <defs><path id="${u}c" d="M50 50 m-36 0 a36 36 0 1 1 72 0 a36 36 0 1 1 -72 0"/></defs>
+    <circle cx="50" cy="50" r="46" fill="none" stroke="var(--accent)" stroke-width="3"/>
+    <circle cx="50" cy="50" r="27" fill="var(--accent)" opacity=".16"/>
+    <text font-size="10.5" font-weight="700" fill="var(--accent)" letter-spacing="1.5" font-family="Fredoka, Noto Sans TC, sans-serif"><textPath href="#${u}c">SEAL CHECK-IN · 海豹認證 ·</textPath></text>
+    <g transform="translate(26 26) scale(.36)">${sealInner({})}</g>
+  </svg>`;
+}
+
+/* ---------- check-in storage (IndexedDB in this browser) ---------- */
+const checkins = {};   // id -> {blob, url, note, at}
+let dbP = null;
+function db(){
+  if (!dbP) dbP = new Promise((res, rej) => {
+    try { const r = indexedDB.open("seal-keelung", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("checkins");
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    } catch (e) { rej(e); }
+  });
+  return dbP;
+}
+async function dbAll(){
+  try { const d = await db(); return await new Promise((res, rej) => {
+    const out = {}, tx = d.transaction("checkins"), st = tx.objectStore("checkins"), cur = st.openCursor();
+    cur.onsuccess = () => { const c = cur.result; if (c) { out[c.key] = c.value; c.continue(); } else res(out); };
+    cur.onerror = () => rej(cur.error); });
+  } catch { return {}; }
+}
+async function dbPut(key, val){ try { const d = await db(); d.transaction("checkins","readwrite").objectStore("checkins").put(val, key); return true; } catch { return false; } }
+async function dbDel(key){ try { const d = await db(); d.transaction("checkins","readwrite").objectStore("checkins").delete(key); } catch {} }
+
+function loadImg(src){ return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("decode")); i.src = src; }); }
+async function processPhoto(file){
+  if (!file || !/^image\//.test(file.type || "image/")) throw new Error("請選擇照片檔（JPG、PNG 或 WebP）");
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImg(url).catch(() => { throw new Error("這張照片的格式無法讀取，請改用 JPG 或 PNG"); });
+    const max = 1600, k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth*k); c.height = Math.round(img.naturalHeight*k);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", .9));
+    if (!blob) throw new Error("照片處理失敗，請再試一次");
+    return blob;
+  } finally { URL.revokeObjectURL(url); }
+}
+function setCheckin(id, rec){
+  if (checkins[id]?.url) URL.revokeObjectURL(checkins[id].url);
+  if (!rec) { delete checkins[id]; return; }
+  checkins[id] = { ...rec, url: URL.createObjectURL(rec.blob) };
+}
+function guardImages(root){
+  root.querySelectorAll("img[data-photo]").forEach(img => img.addEventListener("error", () => {
+    const f = img.closest(".pola"); if (f) f.classList.add("broken"); else img.style.visibility = "hidden";
+  }, { once:true }));
+}
+
+/* ---------- status by clock ---------- */
+let statusMap = {};
+function computeStatus(){
+  const now = new Date(), t = now.getHours()*60 + now.getMinutes();
+  let flagged = false; statusMap = {};
+  STOPS.forEach(s => {
+    const a = mins(s.start), b = mins(s.end);
+    if (t > b) statusMap[s.id] = "past";
+    else if (t >= a) { statusMap[s.id] = flagged ? "future" : "now"; flagged = true; }
+    else { statusMap[s.id] = flagged ? "future" : "next"; flagged = true; }
+  });
+  $("#clock").textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  return t;
+}
+const tripOver = () => STOPS.every(s => statusMap[s.id] === "past");
+const doneCount = () => STOPS.filter(s => checkins[s.id]).length;
+
+/* ---------- render: list ---------- */
+function chipFor(s){
+  if (checkins[s.id]) return `<span class="chip done">已打卡</span>`;
+  const st = statusMap[s.id];
+  if (st === "now") return `<span class="chip now">進行中</span>`;
+  if (st === "next") return `<span class="chip now">下一站</span>`;
+  if (st === "past") return `<span class="chip">已結束</span>`;
+  return "";
+}
+function renderList(){
+  $("#list").innerHTML = STOPS.map((s, i) => `
+    <li class="stop ${checkins[s.id] ? "done" : ""}" data-status="${statusMap[s.id]}" id="card-${s.id}">
+      <div class="rail"><span class="t">${s.start}</span><span class="node"></span></div>
+      <button class="card" type="button" data-open="${s.id}" aria-label="${esc(s.title)}，看完整介紹">
+        <div class="thumb">${scene(s)}${chipFor(s)}
+          ${checkins[s.id] ? `<span class="mini-pola"><img data-photo src="${checkins[s.id].url}" alt="${esc(s.place)} 打卡照"></span>` : ""}</div>
+        <div class="card-body">
+          <div class="meta"><span class="num">${pad(i+1)}</span><span>${s.start} – ${s.end}</span></div>
+          <h3>${esc(s.title)}</h3>
+          <p class="place">${ICON.pin}<span>${esc(s.place)}</span></p>
+          <p class="sum">${esc(s.summary)}</p>
+          <span class="more">看完整介紹與打卡 →</span>
+        </div>
+      </button>
+    </li>`).join("");
+  guardImages($("#list"));
+}
+function renderHeroStats(){
+  const n = doneCount(), C = 2*Math.PI*16, cur = STOPS.find(s => ["now","next"].includes(statusMap[s.id]));
+  $("#heroStats").innerHTML = `
+    <div class="pill"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--line)" stroke-width="4"/>
+      <circle cx="20" cy="20" r="16" fill="none" stroke="var(--ok)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C*n/6} ${C}" transform="rotate(-90 20 20)"/></svg>
+      <span><b>${n} / 6</b><small>已打卡</small></span></div>
+    ${cur ? `<button class="pill" type="button" data-open="${cur.id}"><span class="next-dot"><i></i></span><span><b>${statusMap[cur.id] === "now" ? "現在" : "下一站"} ${cur.start}</b><small>${esc(cur.place)}</small></span></button>`
+          : `<div class="pill"><span class="next-dot"><i></i></span><span><b>今天的行程走完了</b><small>到最下方下載旅程拼貼</small></span></div>`}`;
+}
+function renderFinale(){
+  const n = doneCount(), rots = [-4,3,-2,4,-3,2];
+  $("#finale").innerHTML = `
+    <div class="finale-head">${sealSVG({bob:true,wave:true})}<div><h2 id="finaleTitle">旅程拼貼</h2>
+      ${tripOver() ? `<span class="trip-over">${ICON.star.replace("<svg","<svg width=\"14\" height=\"14\"")} 旅程結束，辛苦了</span>` : ""}</div></div>
+    <p>已打卡 ${n} / 6 站。打卡照會排成一張 1080×1350 的拼貼，剛好是 IG 貼文的 4:5 尺寸，可以下載成 PDF 或 JPG。</p>
+    <div class="slots">${STOPS.map((s,i) => checkins[s.id]
+      ? `<button class="slot has" type="button" style="--rot:${rots[i]}deg" data-open="${s.id}" aria-label="${esc(s.place)} 打卡照"><img data-photo src="${checkins[s.id].url}" alt=""></button>`
+      : `<button class="slot" type="button" data-open="${s.id}" aria-label="到 ${esc(s.place)} 打卡">${i+1}</button>`).join("")}</div>
+    <button class="btn primary block" type="button" id="makeCollage" ${n ? "" : "disabled"}>${ICON.cam} ${n ? "製作我的旅程拼貼" : "先在任一站上傳打卡照"}</button>`;
+  guardImages($("#finale"));
+  $("#makeCollage").addEventListener("click", openCollage);
+}
+function renderAll(){ computeStatus(); renderList(); renderHeroStats(); renderFinale(); }
+
+/* ---------- detail ---------- */
+let openId = null;
+function openDetail(id, push = true){
+  const i = STOPS.findIndex(s => s.id === id); if (i < 0) return;
+  const s = STOPS[i], prev = STOPS[i-1], next = STOPS[i+1], el = $("#detail");
+  const dur = mins(s.end) - mins(s.start);
+  const durTxt = dur >= 60 ? `${Math.floor(dur/60)} 小時${dur%60 ? ` ${dur%60} 分` : ""}` : `${dur} 分鐘`;
+  const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.map)}`;
+  const list = (arr, cls = "") => `<ul class="list ${cls}">${arr.map(x => `<li><span>${esc(x)}</span></li>`).join("")}</ul>`;
+  el.innerHTML = `
+    <div class="sheet-bar"><div class="wrap">
+      <button class="icon-btn" type="button" data-close aria-label="返回行程列表">${ICON.back}</button>
+      <b>${esc(s.place)}</b><span class="step">${i+1} / ${STOPS.length}</span></div></div>
+    <div class="d-art">${scene(s)}</div>
+    <div class="wrap d-body">
+      <div class="d-head">
+        <span class="eyebrow">STOP ${pad(i+1)} · ${s.start}–${s.end}</span>
+        <h1 id="dTitle">${esc(s.title)}</h1>
+        <div class="facts"><span class="fact">${ICON.pin}${esc(s.place)}</span><span class="fact">${ICON.clock}<b>${s.start}–${s.end}</b>（${durTxt}）</span></div>
+      </div>
+      <p class="d-intro">${esc(s.intro)}</p>
+      <div class="say">${sealSVG({bob:true})}<p>${esc(s.seal)}</p></div>
+      <div class="sect"><h2>${ICON.route}怎麼去</h2><ol class="route">${s.route.map(r => `<li><span>${esc(r)}</span></li>`).join("")}</ol></div>
+      ${s.highlights ? `<div class="sect"><h2>${ICON.star}必看亮點</h2>${list(s.highlights)}</div>` : ""}
+      ${s.food ? `<div class="sect"><h2>${ICON.bowl}吃什麼</h2>${list(s.food,"food")}</div>` : ""}
+      ${s.tips ? `<div class="sect"><h2>${ICON.info}小提醒</h2>${list(s.tips,"tips")}</div>` : ""}
+      <a class="btn block" href="${navUrl}" target="_blank" rel="noopener noreferrer">${ICON.nav} 用 Google 地圖導航到 ${esc(s.map)}</a>
+      <section class="checkin" id="ci" aria-labelledby="ciTitle"></section>
+      <div class="pager">
+        <button type="button" class="${prev ? "" : "ghost"}" ${prev ? `data-open="${prev.id}"` : "tabindex=\"-1\" aria-hidden=\"true\""}><small>← 上一站</small><span>${esc(prev?.place || "")}</span></button>
+        <button type="button" class="${next ? "" : "ghost"}" ${next ? `data-open="${next.id}"` : "tabindex=\"-1\" aria-hidden=\"true\""}><small>下一站 →</small><span>${esc(next?.place || "")}</span></button>
+      </div>
+    </div>`;
+  renderCheckin(s, false);
+  el.hidden = false; el.scrollTop = 0; document.body.style.overflow = "hidden";
+  openId = id;
+  if (push) try { history.replaceState(null, "", "#" + id); } catch {}
+  el.querySelector("[data-close]").focus({ preventScroll:true });
+}
+function closeDetail(){
+  $("#detail").hidden = true; $("#detail").innerHTML = ""; openId = null;
+  if ($("#collage").hidden) document.body.style.overflow = "";
+  try { history.replaceState(null, "", location.pathname + location.search); } catch {}
+  renderAll();
+}
+
+function renderCheckin(s, justStamped){
+  const box = $("#ci"); if (!box) return;
+  const rec = checkins[s.id], fid = "file-" + s.id;
+  const input = `<input class="sr" type="file" accept="image/*" id="${fid}">`;
+  if (!rec) {
+    box.innerHTML = `<h2 id="ciTitle">在${esc(s.short)}打卡</h2>
+      <p>上傳你在${esc(s.place)}拍的照片，會收進最後的旅程拼貼。</p>
+      <label class="drop" for="${fid}" id="drop">
+        <svg viewBox="0 0 140 100" aria-hidden="true"><g class="bob">${sealInner({wave:true})}</g>
+          <g transform="translate(4 8)"><rect x="0" y="10" width="40" height="28" rx="6" fill="var(--accent)"/><rect x="12" y="4" width="16" height="8" rx="2" fill="var(--accent)"/><circle cx="20" cy="24" r="8" fill="var(--surface)"/><circle cx="20" cy="24" r="4" fill="var(--accent)"/></g></svg>
+        <b>上傳打卡照</b><span>點這裡拍照或從相簿選，也可以把照片拖進來</span>
+      </label>${input}`;
+  } else {
+    const t = new Date(rec.at);
+    box.innerHTML = `<h2 id="ciTitle">已在${esc(s.short)}打卡</h2>
+      <div class="pola-wrap"><figure class="pola"><img data-photo src="${rec.url}" alt="${esc(s.place)} 打卡照">
+        <div class="broken-msg">照片無法顯示，請按「換一張照片」重新上傳</div>
+        <figcaption>${esc(s.place)} · ${pad(t.getHours())}:${pad(t.getMinutes())}</figcaption>${stampSVG()}</figure></div>
+      <div class="field"><label for="note-${s.id}">一句話心得（會印在拼貼上）</label>
+        <input id="note-${s.id}" maxlength="30" placeholder="例：倒影超美，海豹很滿意" value="${esc(rec.note || "")}"></div>
+      <div class="btn-row"><label class="btn" for="${fid}">${ICON.cam} 換一張照片</label><button class="btn danger" type="button" id="delPhoto">刪除這張</button></div>${input}`;
+    if (!justStamped) box.querySelector(".stamp").classList.remove("pop");
+    guardImages(box);
+    let tm; box.querySelector(`#note-${s.id}`).addEventListener("input", e => {
+      clearTimeout(tm); const v = e.target.value;
+      tm = setTimeout(() => { if (!checkins[s.id]) return; checkins[s.id].note = v; dbPut(s.id, { blob: rec.blob, note: v, at: rec.at }); }, 400);
+    });
+    const del = box.querySelector("#delPhoto"); let armed = false, at;
+    del.addEventListener("click", async () => {
+      if (!armed) { armed = true; del.textContent = "再按一次確定刪除"; at = setTimeout(() => { armed = false; del.textContent = "刪除這張"; }, 3000); return; }
+      clearTimeout(at); await dbDel(s.id); setCheckin(s.id, null); renderCheckin(s, false); toast("已刪除打卡照");
+    });
+  }
+  box.querySelector("#" + fid).addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) handleFile(s, f); });
+  const drop = box.querySelector("#drop");
+  if (drop) {
+    drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+    drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) handleFile(s, f); });
+  }
+}
+async function handleFile(s, file){
+  const drop = $("#drop"); if (drop) { drop.classList.add("busy"); drop.querySelector("b").textContent = "照片處理中…"; }
+  try {
+    const blob = await processPhoto(file);
+    const rec = { blob, note: checkins[s.id]?.note || "", at: Date.now() };
+    const saved = await dbPut(s.id, rec);
+    setCheckin(s.id, rec);
+    renderCheckin(s, true);
+    toast(saved ? `已在${s.short}打卡` : `已打卡（這個瀏覽器無法保存，重新整理後會消失）`);
+  } catch (err) {
+    toast(err.message || "照片上傳失敗，請再試一次");
+    renderCheckin(s, false);
+  }
+}
+
+/* ---------- collage drawing ---------- */
+const CW = 1080, CH = 1350;
+const FD = `"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
+const FN = `Fredoka,"Noto Sans TC",sans-serif`;
+async function ensureFonts(){
+  try { await Promise.all([
+    document.fonts.load(`700 60px "LXGW WenKai TC"`, "基隆海豹散步日記正濱和平島塔廟口回家站"),
+    document.fonts.load(`600 30px Fredoka`, "0123456789:./"),
+    document.fonts.load(`500 30px "Noto Sans TC"`, "打卡站")
+  ]); } catch {}
+}
+function drawSeal(ctx, x, y, s, sleepy){
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  const P = d => new Path2D(d);
+  ctx.fillStyle = "#7d93a6"; ctx.fill(P(SEAL.tail));
+  ctx.fillStyle = "#a9bccb"; ctx.fill(P(SEAL.body));
+  ctx.fillStyle = "rgba(220,230,237,.85)"; ctx.fill(P(SEAL.belly));
+  ctx.beginPath(); ctx.arc(106,46,27,0,7); ctx.fillStyle = "#a9bccb"; ctx.fill();
+  ctx.fillStyle = "#7d93a6"; ctx.fill(P(SEAL.flip));
+  ctx.fillStyle = "#15202b";
+  if (sleepy) { ctx.strokeStyle = "#15202b"; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.stroke(P("M92 43 q5 4 10 0M112 43 q5 4 10 0")); }
+  else { [[97,42],[117,42]].forEach(([a,b]) => { ctx.beginPath(); ctx.arc(a,b,4.6,0,7); ctx.fill(); });
+    ctx.fillStyle = "#fff"; [[98.6,40.4],[118.6,40.4]].forEach(([a,b]) => { ctx.beginPath(); ctx.arc(a,b,1.6,0,7); ctx.fill(); }); }
+  ctx.fillStyle = "#dce6ed"; ctx.beginPath(); ctx.ellipse(107,55,10,7,0,0,7); ctx.fill();
+  ctx.fillStyle = "#15202b"; ctx.beginPath(); ctx.ellipse(107,51.5,3.6,2.6,0,0,7); ctx.fill();
+  ctx.strokeStyle = "#15202b"; ctx.lineWidth = 1.4; ctx.lineCap = "round"; ctx.stroke(P(SEAL.mouth));
+  ctx.fillStyle = "rgba(255,159,178,.55)"; [[90,53],[124,53]].forEach(([a,b]) => { ctx.beginPath(); ctx.arc(a,b,4,0,7); ctx.fill(); });
+  ctx.globalAlpha = .5; ctx.lineWidth = .9; ctx.stroke(P(SEAL.whisk));
+  ctx.restore();
+}
+function drawBg(ctx){
+  const g = ctx.createLinearGradient(0,0,0,CH); g.addColorStop(0,"#0d2b44"); g.addColorStop(.6,"#0a1f33"); g.addColorStop(1,"#06131f");
+  ctx.fillStyle = g; ctx.fillRect(0,0,CW,CH);
+  let s = 5; const r = () => (s = (s*9301+49297)%233280)/233280;
+  ctx.fillStyle = "rgba(255,255,255,.8)";
+  for (let i=0;i<60;i++){ ctx.globalAlpha = r()*.7+.2; ctx.beginPath(); ctx.arc(r()*CW, r()*260, r()*2+.6, 0, 7); ctx.fill(); }
+  ctx.globalAlpha = 1; ctx.strokeStyle = "rgba(150,205,240,.35)"; ctx.lineWidth = 2;
+  for (let i=0;i<14;i++){ ctx.beginPath(); ctx.arc(r()*CW, 300+r()*900, r()*10+4, 0, 7); ctx.stroke(); }
+  const waveFill = (y, amp, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0,y);
+    for (let x=0; x<=CW; x+=10) ctx.lineTo(x, y + Math.sin(x/70)*amp); ctx.lineTo(CW,CH); ctx.lineTo(0,CH); ctx.fill(); };
+  waveFill(1210,10,"#123a5a"); waveFill(1240,8,"#0c2c47");
+}
+function drawRoute(ctx, active){
+  const x0 = 100, x1 = 980, y = 1278;
+  ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 3; ctx.setLineDash([10,10]);
+  ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.setLineDash([]);
+  STOPS.forEach((s,i) => { const x = x0 + (x1-x0)*i/5, on = !!checkins[s.id];
+    ctx.beginPath(); ctx.arc(x, y, i === active ? 15 : 11, 0, 7);
+    ctx.fillStyle = on ? "#ffa865" : "#0c2c47"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = on ? "#ffd2ad" : "rgba(255,255,255,.5)"; ctx.stroke();
+    ctx.fillStyle = i === active ? "#ffd2ad" : "rgba(231,240,247,.85)"; ctx.font = `500 25px ${FD}`; ctx.textAlign = "center"; ctx.fillText(s.short, x, y + 48); });
+  ctx.textAlign = "left";
+}
+function cover(ctx, img, x, y, w, h){
+  const iw = img.width, ih = img.height, k = Math.max(w/iw, h/ih), sw = w/k, sh = h/k;
+  ctx.drawImage(img, (iw-sw)/2, (ih-sh)/2, sw, sh, x, y, w, h);
+}
+function fitText(ctx, text, maxW){ if (ctx.measureText(text).width <= maxW) return text; let t = text; while (t.length && ctx.measureText(t + "…").width > maxW) t = t.slice(0,-1); return t + "…"; }
+function polaroid(ctx, img, x, y, w, h, rot, caption, sub, opts = {}){
+  const pad = Math.max(14, w*.035), bottom = opts.bottom || Math.max(64, h*.12);
+  ctx.save(); ctx.translate(x + w/2, y + h/2); ctx.rotate(rot*Math.PI/180); ctx.translate(-w/2, -h/2);
+  ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 30; ctx.shadowOffsetY = 12;
+  ctx.fillStyle = "#fbf8f1"; ctx.fillRect(0,0,w,h); ctx.shadowColor = "transparent";
+  ctx.fillStyle = "#d9d9d9"; ctx.fillRect(pad, pad, w-pad*2, h-pad-bottom);
+  if (img) cover(ctx, img, pad, pad, w-pad*2, h-pad-bottom);
+  const fs = Math.min(34, Math.max(22, w*.055));
+  ctx.fillStyle = "#2b2b2b"; ctx.font = `700 ${fs}px ${FD}`; ctx.textBaseline = "middle";
+  const cy = opts.note ? h - bottom + bottom*.32 : h - bottom/2;
+  ctx.fillText(fitText(ctx, caption, w - pad*2 - (sub ? fs*3 : 0)), pad, cy);
+  if (sub) { ctx.font = `600 ${fs*.75}px ${FN}`; ctx.fillStyle = "#8a8a8a"; ctx.textAlign = "right"; ctx.fillText(sub, w - pad, cy); ctx.textAlign = "left"; }
+  if (opts.note) { ctx.font = `400 ${fs*.85}px ${FD}`; ctx.fillStyle = "#555"; ctx.fillText(fitText(ctx, opts.note, w - pad*2), pad, h - bottom*.3); }
+  ctx.fillStyle = "rgba(255,214,140,.75)"; ctx.save(); ctx.translate(w/2, 0); ctx.rotate(-.05); ctx.fillRect(-w*.12, -14, w*.24, 30); ctx.restore();
+  ctx.textBaseline = "alphabetic"; ctx.restore();
+}
+async function photoImg(id){
+  const b = checkins[id]?.blob; if (!b) return null;
+  try { return await createImageBitmap(b); } catch { try { return await loadImg(checkins[id].url); } catch { return null; } }
+}
+const tripDate = () => { const ts = Object.values(checkins).map(c => c.at).filter(Boolean); const d = new Date(ts.length ? Math.min(...ts) : Date.now());
+  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
+const LAYOUTS = {
+  1:[[0,0,1,1]], 2:[[0,0,1,.5],[0,.5,1,.5]], 3:[[0,0,1,.54],[0,.54,.5,.46],[.5,.54,.5,.46]],
+  4:[[0,0,.5,.5],[.5,0,.5,.5],[0,.5,.5,.5],[.5,.5,.5,.5]],
+  5:[[0,0,.5,.45],[.5,0,.5,.45],[0,.45,1/3,.55],[1/3,.45,1/3,.55],[2/3,.45,1/3,.55]],
+  6:[[0,0,.5,1/3],[.5,0,.5,1/3],[0,1/3,.5,1/3],[.5,1/3,.5,1/3],[0,2/3,.5,1/3],[.5,2/3,.5,1/3]]
+};
+async function drawCollage(){
+  await ensureFonts();
+  const c = document.createElement("canvas"); c.width = CW; c.height = CH; const ctx = c.getContext("2d");
+  drawBg(ctx);
+  const done = STOPS.filter(s => checkins[s.id]);
+  ctx.fillStyle = "#e7f0f7"; ctx.font = `700 74px ${FD}`; ctx.fillText("基隆海豹散步日記", 64, 128);
+  ctx.fillStyle = "#8ec7e6"; ctx.font = `600 32px ${FN}`; ctx.fillText(`${tripDate()}  ·  ${done.length} / 6 STOPS`, 66, 182);
+  drawSeal(ctx, 820, 20, 1.6, false);
+  const rots = [-2.6,2.2,-1.6,2.8,-2.2,1.6], ax = 56, ay = 236, aw = 968, ah = 940;
+  const L = LAYOUTS[done.length];
+  for (let i = 0; i < done.length; i++){
+    const s = done[i], [fx,fy,fw,fh] = L[i], m = 16;
+    const img = await photoImg(s.id);
+    polaroid(ctx, img, ax+fx*aw+m, ay+fy*ah+m, fw*aw-m*2, fh*ah-m*2, rots[i], `${STOPS.indexOf(s)+1}. ${s.place.replace(/ → .*/,"")}`, s.start);
+  }
+  drawRoute(ctx, -1);
+  return c;
+}
+async function drawStopPage(s){
+  const c = document.createElement("canvas"); c.width = CW; c.height = CH; const ctx = c.getContext("2d");
+  drawBg(ctx);
+  const i = STOPS.indexOf(s), rec = checkins[s.id];
+  ctx.fillStyle = "#5fd4c6"; ctx.font = `600 30px ${FN}`; ctx.fillText(`STOP ${pad(i+1)}  ·  ${s.start}–${s.end}`, 66, 110);
+  ctx.fillStyle = "#e7f0f7"; ctx.font = `700 66px ${FD}`; ctx.fillText(fitText(ctx, s.title, 700), 64, 186);
+  drawSeal(ctx, 840, 50, 1.3, i === 5);
+  const img = await photoImg(s.id);
+  polaroid(ctx, img, 110, 250, 860, 950, -1.4, s.place, "", { bottom: 150, note: rec?.note || s.seal });
+  drawRoute(ctx, i);
+  return c;
+}
+const canvasBlob = (c, type = "image/jpeg", q = .92) => new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("export")), type, q));
+
+/* ---------- downloads ---------- */
+let dlP = null;
+function getDownloads(){
+  if (!window.claude || typeof window.claude.use !== "function") return Promise.resolve(null);
+  if (!dlP) dlP = Promise.resolve(window.claude.use("downloads")).catch(() => null);
+  return dlP;
+}
+async function saveFile(name, blob){
+  const dl = await getDownloads();
+  if (dl) {
+    try { await dl.save({ filename: name, data: blob }); toast(`已下載 ${name}`); }
+    catch (e) {
+      const code = e && e.code;
+      toast(code === "declined" ? "已取消下載" : code === "rate_limited" ? "下載視窗已經開著，請先處理它" : "這個檢視無法下載檔案");
+    }
+    return;
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  toast(`已下載 ${name}`);
+}
+
+/* ---------- collage sheet ---------- */
+let collageCanvas = null;
+async function openCollage(){
+  const el = $("#collage");
+  el.innerHTML = `
+    <div class="sheet-bar"><div class="wrap"><button class="icon-btn" type="button" data-close-collage aria-label="返回">${ICON.back}</button><b>旅程拼貼</b></div></div>
+    <div class="wrap c-body">
+      <div class="c-prev" id="cPrev"><div class="loading">${sealSVG({bob:true})}<span>海豹正在排照片…</span></div></div>
+      <div class="btn-row">
+        <button class="btn primary" type="button" id="dlPdf" disabled>${ICON.dl} 下載 PDF</button>
+        <button class="btn" type="button" id="dlJpg" disabled>${ICON.dl} 下載 IG 圖片</button>
+        <button class="btn" type="button" id="shareBtn" hidden>${ICON.share} 分享</button>
+      </div>
+      <p class="hint">PDF 第 1 頁是整天的拼貼，後面每個打卡站各一頁，每頁都是 1080×1350（IG 4:5）。IG 不能直接上傳 PDF，要發文請用「下載 IG 圖片」的 JPG。</p>
+    </div>`;
+  el.hidden = false; el.scrollTop = 0; document.body.style.overflow = "hidden";
+  el.querySelector("[data-close-collage]").addEventListener("click", () => { el.hidden = true; if ($("#detail").hidden) document.body.style.overflow = ""; });
+  try {
+    collageCanvas = await drawCollage();
+    const url = collageCanvas.toDataURL("image/jpeg", .9);
+    $("#cPrev").innerHTML = `<img src="${url}" alt="旅程拼貼預覽">`;
+    $("#dlJpg").disabled = false; $("#dlPdf").disabled = !window.jspdf;
+    if (!window.jspdf) $("#dlPdf").title = "PDF 元件沒有載入，請重新整理頁面";
+    $("#dlJpg").addEventListener("click", async () => saveFile(`keelung-seal-${tripDate().replace(/\./g,"")}.jpg`, await canvasBlob(collageCanvas)));
+    $("#dlPdf").addEventListener("click", makePdf);
+    const sb = $("#shareBtn");
+    if (navigator.canShare && !window.claude) {
+      const probe = new File([new Blob(["x"])], "a.jpg", { type:"image/jpeg" });
+      try { if (navigator.canShare({ files:[probe] })) { sb.hidden = false; sb.addEventListener("click", async () => {
+        try { const f = new File([await canvasBlob(collageCanvas)], "keelung-seal.jpg", { type:"image/jpeg" });
+          await navigator.share({ files:[f], title:"基隆海豹散步日記" }); }
+        catch (e) { if (e.name !== "AbortError") toast("這裡無法開啟分享，請改用下載 IG 圖片"); } }); } } catch {}
+    }
+  } catch {
+    $("#cPrev").innerHTML = `<p class="hint">拼貼製作失敗，請重新整理後再試一次。</p>`;
+  }
+}
+async function makePdf(){
+  const btn = $("#dlPdf"); btn.disabled = true; const label = btn.innerHTML; btn.textContent = "製作 PDF 中…";
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:"portrait", unit:"px", format:[CW, CH], hotfixes:["px_scaling"], compress:true });
+    doc.addImage(collageCanvas.toDataURL("image/jpeg", .9), "JPEG", 0, 0, CW, CH);
+    for (const s of STOPS.filter(s => checkins[s.id])) {
+      const c = await drawStopPage(s);
+      doc.addPage([CW, CH], "portrait"); doc.addImage(c.toDataURL("image/jpeg", .88), "JPEG", 0, 0, CW, CH);
+    }
+    await saveFile(`keelung-seal-${tripDate().replace(/\./g,"")}.pdf`, doc.output("blob"));
+  } catch { toast("PDF 製作失敗，可以先下載 IG 圖片"); }
+  btn.disabled = false; btn.innerHTML = label;
+}
+
+/* ---------- misc ---------- */
+let toastT;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600); }
+
+function themeIcon(){
+  const r = document.documentElement.getAttribute("data-theme");
+  $("#themeBtn").innerHTML = r === "light" ? ICON.moon : ICON.sun;
+}
+function initTheme(){
+  try { const t = localStorage.getItem("seal-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch {}
+  themeIcon();
+  $("#themeBtn").addEventListener("click", () => {
+    const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("seal-theme", next); } catch {}
+    themeIcon();
+  });
+}
+function initBubbles(){
+  const b = $("#bubbles"); let html = "";
+  for (let i=0;i<12;i++){ const s = 6 + (i*7)%18;
+    html += `<span style="left:${(i*37)%100}%;width:${s}px;height:${s}px;animation-duration:${14+(i*5)%16}s;animation-delay:-${(i*3)%14}s"></span>`; }
+  b.innerHTML = html;
+}
+
+document.addEventListener("click", e => {
+  const o = e.target.closest("[data-open]"); if (o) { openDetail(o.dataset.open); return; }
+  if (e.target.closest("[data-close]")) closeDetail();
+});
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#collage").hidden) { $("#collage").hidden = true; if ($("#detail").hidden) document.body.style.overflow = ""; }
+  else if (!$("#detail").hidden) closeDetail();
+});
+
+async function init(){
+  $("#brand").innerHTML = `${sealSVG({})}<div><b>海豹漫遊基隆</b><small>港都一日散步</small></div>`;
+  $("#heroArt").innerHTML = heroSVG();
+  const d = new Date(); $("#dayLabel").textContent = `${d.getMonth()+1} 月 ${d.getDate()} 日 · 依現在時間標示進度`;
+  initTheme(); initBubbles(); renderAll();
+  const saved = await dbAll();
+  Object.entries(saved).forEach(([k, v]) => { if (v && v.blob) setCheckin(k, v); });
+  renderAll();
+  const h = (location.hash || "").slice(1);
+  if (STOPS.some(s => s.id === h)) openDetail(h, false);
+  setInterval(() => { const before = JSON.stringify(statusMap); computeStatus();
+    if (!openId && JSON.stringify(statusMap) !== before) renderAll(); }, 30000);
+  getDownloads();
+}
+init();
+</script>
